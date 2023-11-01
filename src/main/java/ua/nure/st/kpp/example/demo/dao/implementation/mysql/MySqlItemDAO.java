@@ -6,6 +6,7 @@ import ua.nure.st.kpp.example.demo.dao.implementation.mysql.util.MySqlConnection
 import ua.nure.st.kpp.example.demo.entity.Item;
 
 import java.math.BigDecimal;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,6 +35,9 @@ public class MySqlItemDAO implements ItemDAO {
         public static final String UPDATE_ITEM = "UPDATE items SET vendor = ?, name = ?,unit_id = ?, weight = ?, reserve_rate = ? WHERE id = ?;";
         public static final String SET_AMOUNT_NULL = "UPDATE items SET amount = NULL WHERE id = ?;";
         public static final String GET_ALL_ITEMS_ID = "SELECT id FROM items WHERE amount IS NOT NULL ORDER BY id";
+    }
+    private static class Procedure{
+        public static final String GET_ITEM_BY_NAME = "CALL get_all_items_by_name(?);";
     }
 
     @Override
@@ -195,6 +199,24 @@ public class MySqlItemDAO implements ItemDAO {
         }
         return idList;
 
+    }
+
+    @Override
+    public List<Item> readAllByName(String name) throws DAOException {
+        List<Item> items = new LinkedList<>();
+        try (Connection connection = mySqlConnectionUtils.getConnection();
+             CallableStatement callableStatement = connection.prepareCall(Procedure.GET_ITEM_BY_NAME)) {
+            callableStatement.setString("name",name);
+            try (ResultSet resultSet = callableStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Item item = mapItem(resultSet);
+                    items.add(item);
+                }
+            }
+        } catch (SQLException exception) {
+            throw new DAOException(exception);
+        }
+        return items;
     }
 
     private Item mapItem(ResultSet resultSet) throws SQLException {

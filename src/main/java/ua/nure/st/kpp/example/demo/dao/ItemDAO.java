@@ -21,4 +21,6 @@ public interface ItemDAO {
     boolean delete(int id) throws DAOException;
 
     List<Integer> readAllAvailableId() throws DAOException;
+
+    List<Item> readAllByName(String name) throws DAOException;
 }

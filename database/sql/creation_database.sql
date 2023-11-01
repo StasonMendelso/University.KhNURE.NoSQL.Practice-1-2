@@ -69,3 +69,12 @@ CREATE TABLE IF NOT EXISTS `warehouse`.`outcome_journal` (
                                                              CONSTRAINT `fk_income_journal_items10`
                                                                  FOREIGN KEY (`items_id`)
                                                                      REFERENCES `warehouse`.`items` (`id`));
+
+DELIMITER //
+CREATE PROCEDURE get_all_items_by_name(IN name VARCHAR(200))
+BEGIN
+    SELECT items.id, vendor, items.name, unit, weight, amount, reserve_rate
+    FROM items JOIN units ON items.unit_id = units.id
+    WHERE items.name LIKE CONCAT('%', name, '%');
+END //
+DELIMITER ;

@@ -115,6 +115,7 @@ Here you can find the screenshots of the web-application:
 ![](readme/images/web-application-examples/img_5.png)
 ![](readme/images/web-application-examples/img_6.png)
 ![](readme/images/web-application-examples/img_7.png)
+![](readme/images/web-application-examples/img_8.png)
 
 ## Built With
 

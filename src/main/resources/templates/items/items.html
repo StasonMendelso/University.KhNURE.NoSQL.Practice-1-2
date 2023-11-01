@@ -7,6 +7,11 @@
     <div>
         <h2>Items</h2>
         <a href="/items/add">Add a new item</a>
+        <form th:action="@{/items/search}" th:method="GET">
+            <span>Знайти за іменем товар</span>
+            <input name="name" type="text">
+            <button type="submit" class="btn btn-success">Знайти</button>
+        </form>
         <div class="table-responsive">
             <table class="table table-hover">
                 <thead>
@@ -30,7 +35,8 @@
                     <td th:utext="${item.getWeight()}">...</td>
                     <td th:utext="${item.getAmount()}">...</td>
                     <td th:utext="${item.getReserveRate()}">...</td>
-                    <td class="text-center"><a th:href="@{/items/{id}/edit(id=${item.getId()})}" class="btn btn-primary">Edit</a></td>
+                    <td class="text-center"><a th:href="@{/items/{id}/edit(id=${item.getId()})}"
+                                               class="btn btn-primary">Edit</a></td>
                     <td class="text-center">
                         <form th:action="@{/items/{id}(id=${item.getId()})}" th:method="DELETE">
                             <input type="submit" class="btn btn-danger container" value="Remove"/>
