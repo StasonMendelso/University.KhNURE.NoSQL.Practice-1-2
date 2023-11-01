@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/headers::head(title='Items')"></head>
+<body>
+<nav th:replace="fragments/navbar::nav"></nav>
+<main class="container">
+    <div>
+        <h2>Companies</h2>
+        <a th:href="@{/companies/add}">Add a new company</a>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Address</th>
+                    <th colspan="1">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="company :  ${companiesList}">
+                    <th scope="row" th:utext="${company.getId()}">...</th>
+                    <td th:utext="${company.getName()}">...</td>
+                    <td th:utext="${company.getEmail()}">...</td>
+                    <td th:utext="${company.getAddress()}">...</td>
+                    <td class="text-center"><a th:href="@{/companies/{id}/edit(id=${company.getId()})}" class="btn btn-primary">Edit</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

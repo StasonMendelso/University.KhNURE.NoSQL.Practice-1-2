@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/headers::head(title='Items')"></head>
+<body>
+<nav th:replace="fragments/navbar::nav"></nav>
+<main class="container">
+    <div>
+        <h2>Items</h2>
+        <a href="/items/add">Add a new item</a>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Vendor</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Unit</th>
+                    <th scope="col">Weight</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Reserve Rate</th>
+                    <th colspan="2">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${itemsList}">
+                    <th scope="row" th:utext="${item.getId()}">...</th>
+                    <td th:utext="${item.getVendor()}">...</td>
+                    <td th:utext="${item.getName()}">...</td>
+                    <td th:utext="${item.getUnit()}">...</td>
+                    <td th:utext="${item.getWeight()}">...</td>
+                    <td th:utext="${item.getAmount()}">...</td>
+                    <td th:utext="${item.getReserveRate()}">...</td>
+                    <td class="text-center"><a th:href="@{/items/{id}/edit(id=${item.getId()})}" class="btn btn-primary">Edit</a></td>
+                    <td class="text-center">
+                        <form th:action="@{/items/{id}(id=${item.getId()})}" th:method="DELETE">
+                            <input type="submit" class="btn btn-danger container" value="Remove"/>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

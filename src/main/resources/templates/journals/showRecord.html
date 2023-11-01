@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/headers::head(title='Items')"></head>
+<body>
+<nav th:replace="fragments/navbar::nav"></nav>
+<main class="container">
+    <div>
+        <h2>Record</h2>
+        <h4 th:text="${record.documentNumber}"></h4>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Document number</th>
+                    <th scope="col">Item id</th>
+                    <th scope="col">Company id</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row" th:utext="${record.getId()}">...</th>
+                    <td th:utext="${record.getDocumentNumber()}">...</td>
+                    <td th:utext="${record.getItem().getId()}">...</td>
+                    <td th:utext="${record.getCompany().getId()}">...</td>
+                    <td th:utext="${record.getDate()}">...</td>
+                    <td th:utext="${record.getPrice()}">...</td>
+                    <td th:utext="${record.getAmount()}">...</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <h2>Item</h2>
+        <h4 th:text="${record.getItem().getVendor()}"></h4>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Vendor</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Unit</th>
+                    <th scope="col">Weight</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Reserve Rate</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row" th:utext="${record.getItem().getId()}">...</th>
+                    <td th:utext="${record.getItem().getVendor()}">...</td>
+                    <td th:utext="${record.getItem().getName()}">...</td>
+                    <td th:utext="${record.getItem().getUnit()}">...</td>
+                    <td th:utext="${record.getItem().getWeight()}">...</td>
+                    <td th:utext="${record.getItem().getAmount()}">...</td>
+                    <td th:utext="${record.getItem().getReserveRate()}">...</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <h2>Company</h2>
+        <h4 th:text="${record.getCompany().getName()}"></h4>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Address</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row" th:utext="${record.getCompany().getId()}">...</th>
+                    <td th:utext="${record.getCompany().getName()}">...</td>
+                    <td th:utext="${record.getCompany().getEmail()}">...</td>
+                    <td th:utext="${record.getCompany().getAddress()}">...</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

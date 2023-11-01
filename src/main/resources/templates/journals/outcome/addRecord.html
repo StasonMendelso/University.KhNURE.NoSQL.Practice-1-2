@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head th:replace="fragments/headers::head(title='Items')"></head>
+<body>
+<nav th:replace="fragments/navbar::nav"></nav>
+<main class="container">
+    <div>
+        <h2>Add Record</h2>
+        <form th:action="@{/journal/outcome}" th:object="${addRecordForm}" th:method="POST">
+            <div class="form-group">
+                <label th:for="documentNumber">Document number</label>
+                <input type="text" class="form-control" placeholder="Enter document number"
+                       th:field="*{documentNumber}"/>
+                <div class="error" th:if="${#fields.hasErrors('documentNumber')}" th:errors="*{documentNumber}">Document number error</div>
+            </div>
+            <div class="form-group">
+                <label th:for="itemId">Item id</label>
+                <select type="text" class="form-control" th:field="*{itemId}" >
+                    <option th:each="itemId : ${itemIdList}" th:value="${itemId}" th:text="${itemId}"></option>
+                </select>
+                <div class="error" th:if="${#fields.hasErrors('itemId')}" th:errors="*{itemId}">Item id error</div>
+            </div>
+            <div class="form-group">
+                <label th:for="companyId">Company id</label>
+                <select type="text" class="form-control" th:field="*{companyId}">
+                    <option th:each="companyId : ${companyIdList}" th:value="${companyId}" th:text="${companyId}"></option>
+                </select>
+                <div class="error" th:if="${#fields.hasErrors('companyId')}" th:errors="*{companyId}">Company id error</div>
+            </div>
+            <div class="form-group">
+                <label th:for="price">Price</label>
+                <input type="text" class="form-control" placeholder="Enter price" th:field="*{price}"/>
+                <div class="error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">Price error</div>
+            </div>
+            <div class="form-group">
+                <label th:for="amount">Amount</label>
+                <input type="number" class="form-control" placeholder="Enter amount" th:field="*{amount}"/>
+                <div class="error" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">Amount error</div>
+            </div>
+            <div class="form-group pt-1">
+                <input type="submit" class="btn btn-success container" value="Save"/>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,15 @@
+td {
+    word-wrap: break-word;
+}
+
+th {
+    text-align: center;
+}
+
+.text-center {
+    text-align: center;
+}
+.error{
+    color: red;
+    font-style: italic;
+}

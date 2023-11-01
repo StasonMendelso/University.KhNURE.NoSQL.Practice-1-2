@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/headers::head(title='Items')"></head>
+<body>
+<nav th:replace="fragments/navbar::nav"></nav>
+<main class="container">
+    <div>
+        <h2>Outcome journal</h2>
+        <a th:href="@{/journal/outcome/add}">Add a new record</a>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Document number</th>
+                    <th scope="col">Item id</th>
+                    <th scope="col">Company id</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Amount</th>
+                    <th colspan="3">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr  th:each="outcomeRecord : ${outcomeRecordsList}">
+                    <th scope="row" th:utext="${outcomeRecord.getId()}">...</th>
+                    <td th:utext="${outcomeRecord.getDocumentNumber()}">...</td>
+                    <td th:utext="${outcomeRecord.getItem().getId()}">...</td>
+                    <td th:utext="${outcomeRecord.getCompany().getId()}">...</td>
+                    <td th:utext="${outcomeRecord.getDate()}">...</td>
+                    <td th:utext="${outcomeRecord.getPrice()}">...</td>
+                    <td th:utext="${outcomeRecord.getAmount()}">...</td>
+                    <td class="text-center"><a th:href="@{/journal/outcome/{id}(id=${outcomeRecord.getId()})}" class="btn btn-success">More</a></td>
+                    <td class="text-center"><a th:href="@{/journal/outcome/{id}/edit(id=${outcomeRecord.getId()})}" class="btn btn-primary">Edit</a></td>
+                    <td class="text-center">
+                        <form th:action="@{/journal/outcome/{id}(id=${outcomeRecord.getId()})}" th:method="DELETE">
+                            <input type="submit" class="btn btn-danger container" value="Remove"/>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>
