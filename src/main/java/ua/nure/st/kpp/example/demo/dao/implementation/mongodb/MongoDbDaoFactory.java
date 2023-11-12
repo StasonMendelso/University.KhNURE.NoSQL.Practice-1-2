@@ -24,7 +24,7 @@ public class MongoDbDaoFactory implements Factory {
 
     @Override
     public ItemDAO createItemDAO() {
-        return new MongoDbItemDAO();
+        return new MongoDbItemDAO(mongoDatabase);
     }
 
     @Override

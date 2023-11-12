@@ -8,19 +8,19 @@ import java.util.List;
 public interface ItemDAO {
     boolean create(Item item) throws DAOException;
 
-    boolean updateQuantity(int id, int quantity) throws DAOException;
+    boolean updateQuantity(String id, int quantity) throws DAOException;
 
-    boolean update(int id, Item item) throws DAOException;
+    boolean update(String id, Item item) throws DAOException;
 
     List<Item> readAll() throws DAOException;
 
-    Item read(String vendor) throws DAOException;
+    Item readByVendor(String vendor) throws DAOException;
 
-    Item read(int id) throws DAOException;
+    Item readById(String id) throws DAOException;
 
-    boolean delete(int id) throws DAOException;
+    boolean delete(String id) throws DAOException;
 
-    List<Integer> readAllAvailableId() throws DAOException;
+    List<String> readAllAvailableId() throws DAOException;
 
     List<Item> readAllByName(String name) throws DAOException;
 }

@@ -64,14 +64,14 @@ public class ItemsController {
 	}
 
 	@GetMapping("/{id}/edit")
-	public String editItem(Model model, @PathVariable("id") int id) throws DAOException {
-		EditItemForm editItemForm = transformerService.toEditItemForm(itemDAO.read(id));
+	public String editItem(Model model, @PathVariable("id") String id) throws DAOException {
+		EditItemForm editItemForm = transformerService.toEditItemForm(itemDAO.readByVendor(id));
 		model.addAttribute("editItemForm", editItemForm);
 		return "items/editItem";
 	}
 
 	@PatchMapping("/{id}")
-	public String updateItem(@ModelAttribute("editItemForm") @Validated EditItemForm editItemForm, BindingResult bindingResult, @PathVariable("id") int id) throws DAOException {
+	public String updateItem(@ModelAttribute("editItemForm") @Validated EditItemForm editItemForm, BindingResult bindingResult, @PathVariable("id") String id) throws DAOException {
 		if (bindingResult.hasErrors()) {
 			return "items/editItem";
 		}
@@ -81,7 +81,7 @@ public class ItemsController {
 	}
 
 	@DeleteMapping("/{id}")
-	public String deleteItem(@PathVariable("id") int id) throws DAOException {
+	public String deleteItem(@PathVariable("id") String id) throws DAOException {
 		itemDAO.delete(id);
 		return "redirect:/items";
 	}

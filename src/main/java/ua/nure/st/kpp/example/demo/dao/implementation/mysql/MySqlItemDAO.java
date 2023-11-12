@@ -65,12 +65,12 @@ public class MySqlItemDAO implements ItemDAO {
     }
 
     @Override
-    public boolean updateQuantity(int id, int quantity) throws DAOException {
+    public boolean updateQuantity(String id, int quantity) throws DAOException {
         try (Connection connection = mySqlConnectionUtils.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Query.UPDATE_ITEM_QUANTITY_BY_ID)) {
             int index = 1;
             preparedStatement.setInt(index++, quantity);
-            preparedStatement.setInt(index, id);
+            preparedStatement.setInt(index, Integer.parseInt(id));
 
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException exception) {
@@ -79,12 +79,12 @@ public class MySqlItemDAO implements ItemDAO {
     }
 
     @Override
-    public boolean update(int id, Item item) throws DAOException {
+    public boolean update(String id, Item item) throws DAOException {
         try (Connection connection = mySqlConnectionUtils.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Query.UPDATE_ITEM)) {
             int unitId = getUnitId(item, connection);
 
-            mapUpdateStatement(preparedStatement, id, item, unitId);
+            mapUpdateStatement(preparedStatement, Integer.parseInt(id), item, unitId);
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException exception) {
             throw new DAOException(exception);
@@ -142,7 +142,7 @@ public class MySqlItemDAO implements ItemDAO {
     }
 
     @Override
-    public Item read(String vendor) throws DAOException {
+    public Item readByVendor(String vendor) throws DAOException {
         try (Connection connection = mySqlConnectionUtils.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Query.GET_ITEM_BY_VENDOR)) {
             preparedStatement.setString(1, vendor);
@@ -158,10 +158,10 @@ public class MySqlItemDAO implements ItemDAO {
     }
 
     @Override
-    public Item read(int id) throws DAOException {
+    public Item readById(String id) throws DAOException {
         try (Connection connection = mySqlConnectionUtils.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Query.GET_ITEM_BY_ID)) {
-            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(1, Integer.parseInt(id));
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return mapItem(resultSet);
@@ -174,10 +174,10 @@ public class MySqlItemDAO implements ItemDAO {
     }
 
     @Override
-    public boolean delete(int id) throws DAOException {
+    public boolean delete(String id) throws DAOException {
         try (Connection connection = mySqlConnectionUtils.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Query.SET_AMOUNT_NULL)) {
-            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(1, Integer.parseInt(id));
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException exception) {
             throw new DAOException(exception);
@@ -185,13 +185,13 @@ public class MySqlItemDAO implements ItemDAO {
     }
 
     @Override
-    public List<Integer> readAllAvailableId() throws DAOException {
-        List<Integer> idList = new LinkedList<>();
+    public List<String> readAllAvailableId() throws DAOException {
+        List<String> idList = new LinkedList<>();
         try (Connection connection = mySqlConnectionUtils.getConnection();
              Statement statement = connection.createStatement()){
             try(ResultSet resultSet = statement.executeQuery(Query.GET_ALL_ITEMS_ID)){
                 while(resultSet.next()){
-                    idList.add(resultSet.getInt("id"));
+                    idList.add(String.valueOf(resultSet.getInt("id")));
                 }
             }
         } catch (SQLException exception) {
