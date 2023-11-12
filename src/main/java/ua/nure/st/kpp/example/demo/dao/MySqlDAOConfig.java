@@ -2,34 +2,22 @@ package ua.nure.st.kpp.example.demo.dao;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "database")
-public class DAOConfig {
-    private String type;
+@ConfigurationProperties(prefix = "database.mysql")
+public class MySqlDAOConfig {
     private String url;
     private String user;
     private String password;
 
-    public DAOConfig() {
+    public MySqlDAOConfig() {
     }
 
-    public DAOConfig(String type) {
-        this.type = type;
-    }
 
-    public DAOConfig(String type, String url, String user, String password) {
-        this.type = type;
+    public MySqlDAOConfig(String url, String user, String password) {
         this.url = url;
         this.user = user;
         this.password = password;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
 
     public String getUrl() {
         return url;
@@ -57,8 +45,7 @@ public class DAOConfig {
 
     @Override
     public String toString() {
-        return "DAOConfig{" +
-                "type='" + type + '\'' +
+        return "MySqlDAOConfig{" +
                 ", url='" + url + '\'' +
                 ", user='" + user + '\'' +
                 ", password='" + password + '\'' +

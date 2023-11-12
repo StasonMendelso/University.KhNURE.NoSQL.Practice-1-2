@@ -63,10 +63,10 @@ public class MySqlCompanyDAO implements CompanyDAO {
     }
 
     @Override
-    public Company read(int id) throws DAOException {
+    public Company read(String id) throws DAOException {
         try (Connection connection = mySqlConnectionUtils.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Query.GET_COMPANY_BY_ID)) {
-            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(1, Integer.parseInt(id));
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return mapCompany(resultSet);
@@ -79,13 +79,13 @@ public class MySqlCompanyDAO implements CompanyDAO {
     }
 
     @Override
-    public List<Integer> readAllAvailableId() throws DAOException {
-        List<Integer> idList = new LinkedList<>();
+    public List<String> readAllAvailableId() throws DAOException {
+        List<String> idList = new LinkedList<>();
         try (Connection connection = mySqlConnectionUtils.getConnection();
             Statement statement = connection.createStatement()){
             try(ResultSet resultSet = statement.executeQuery(Query.GET_ALL_COMPANIES_ID)){
                 while(resultSet.next()){
-                    idList.add(resultSet.getInt("id"));
+                    idList.add(String.valueOf(resultSet.getInt("id")));
                 }
             }
         } catch (SQLException exception) {
@@ -95,7 +95,7 @@ public class MySqlCompanyDAO implements CompanyDAO {
     }
 
     private Company mapCompany(ResultSet resultSet) throws SQLException {
-        int id = resultSet.getInt("id");
+        String id = String.valueOf(resultSet.getInt("id"));
         String name = resultSet.getString("name");
         String email = resultSet.getString("email");
         String address = resultSet.getString("address");
@@ -108,14 +108,14 @@ public class MySqlCompanyDAO implements CompanyDAO {
     }
 
     @Override
-    public boolean update(int id, Company company) throws DAOException {
+    public boolean update(String id, Company company) throws DAOException {
         try (Connection connection = mySqlConnectionUtils.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Query.UPDATE_COMPANY_BY_ID)) {
             int index = 1;
             preparedStatement.setString(index++, company.getName());
             preparedStatement.setString(index++, company.getEmail());
             preparedStatement.setString(index++, company.getAddress());
-            preparedStatement.setInt(index, id);
+            preparedStatement.setInt(index, Integer.parseInt(id));
 
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException exception) {

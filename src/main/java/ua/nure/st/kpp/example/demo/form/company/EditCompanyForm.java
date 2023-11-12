@@ -5,7 +5,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 public class EditCompanyForm {
-    private int id;
+    private String id;
     @NotEmpty(message = "The name can't be empty")
     @Size(min = 2, max = 200, message = "The min and max size of the name is 2-200")
     private String name;
@@ -19,18 +19,18 @@ public class EditCompanyForm {
     public EditCompanyForm() {
     }
 
-    public EditCompanyForm(int id, String name, String address, String email) {
+    public EditCompanyForm(String id, String name, String address, String email) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.email = email;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

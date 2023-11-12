@@ -45,7 +45,7 @@ public class MySqlOutcomeJournalDAO implements OutcomeJournalDAO {
                 mapStatement(preparedStatement1, record);
 
                 preparedStatement2.setInt(1, record.getAmount());
-                preparedStatement2.setInt(2, record.getItem().getId());
+                preparedStatement2.setInt(2, Integer.parseInt(record.getItem().getId()));
 
                 preparedStatement1.execute();
                 preparedStatement2.executeUpdate();
@@ -84,7 +84,7 @@ public class MySqlOutcomeJournalDAO implements OutcomeJournalDAO {
 
 
     private Item mapItem(ResultSet resultSet) throws SQLException {
-        int id = resultSet.getInt("items.id");
+        String id = String.valueOf(resultSet.getInt("items.id"));
         String vendor = resultSet.getString("items.vendor");
         String name = resultSet.getString("items.name");
         String unit = resultSet.getString("units.unit");
@@ -103,7 +103,7 @@ public class MySqlOutcomeJournalDAO implements OutcomeJournalDAO {
     }
 
     private Company mapCompany(ResultSet resultSet) throws SQLException {
-        int id = resultSet.getInt("companies.id");
+        String id = String.valueOf(resultSet.getInt("companies.id"));
         String name = resultSet.getString("companies.name");
         String email = resultSet.getString("companies.email");
         String address = resultSet.getString("companies.address");
@@ -122,7 +122,7 @@ public class MySqlOutcomeJournalDAO implements OutcomeJournalDAO {
         BigDecimal price = resultSet.getBigDecimal("outcome_journal.price");
         int amount = resultSet.getInt("amount");
         return new Record.Builder<>()
-                .id(id)
+                .id(String.valueOf(id))
                 .documentNumber(documentNumber)
                 .date(date)
                 .price(price)
@@ -152,7 +152,7 @@ public class MySqlOutcomeJournalDAO implements OutcomeJournalDAO {
                         preparedStatement3.executeUpdate();
 
                         preparedStatement4.setInt(1,record.getAmount());
-                        preparedStatement4.setInt(2,record.getItem().getId());
+                        preparedStatement4.setInt(2, Integer.parseInt(record.getItem().getId()));
                         preparedStatement4.executeUpdate();
                         connection.commit();
                         return true;
@@ -172,8 +172,8 @@ public class MySqlOutcomeJournalDAO implements OutcomeJournalDAO {
     private void mapUpdateStatement(PreparedStatement preparedStatement, int id, Record record) throws SQLException {
         int index = 1;
         preparedStatement.setString(index++, record.getDocumentNumber());
-        preparedStatement.setInt(index++, record.getItem().getId());
-        preparedStatement.setInt(index++, record.getCompany().getId());
+        preparedStatement.setInt(index++, Integer.parseInt(record.getItem().getId()));
+        preparedStatement.setInt(index++, Integer.parseInt(record.getCompany().getId()));
         preparedStatement.setBigDecimal(index++, record.getPrice());
         preparedStatement.setInt(index++, record.getAmount());
         preparedStatement.setInt(index, id);
@@ -182,8 +182,8 @@ public class MySqlOutcomeJournalDAO implements OutcomeJournalDAO {
     private void mapStatement(PreparedStatement preparedStatement, Record record) throws SQLException {
         int index = 1;
         preparedStatement.setString(index++, record.getDocumentNumber());
-        preparedStatement.setInt(index++, record.getItem().getId());
-        preparedStatement.setInt(index++, record.getCompany().getId());
+        preparedStatement.setInt(index++, Integer.parseInt(record.getItem().getId()));
+        preparedStatement.setInt(index++, Integer.parseInt(record.getCompany().getId()));
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         preparedStatement.setTimestamp(index++, Timestamp.valueOf(record.getDate().format(dateTimeFormatter)));
         preparedStatement.setBigDecimal(index++, record.getPrice());

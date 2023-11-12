@@ -10,7 +10,7 @@ import java.util.Objects;
  * @author Hlova Stanislav
  */
 public class Item {
-    private int id;
+    private String id;
     private String vendor;
     private String name;
     private String unit;
@@ -32,7 +32,7 @@ public class Item {
         this.reserveRate = builder.reserveRate;
     }
 
-    public Item(int id, String vendor, String name, String unit, BigDecimal weight, int amount, int reserveRate) {
+    public Item(String id, String vendor, String name, String unit, BigDecimal weight, int amount, int reserveRate) {
         this.id = id;
         this.vendor = vendor;
         this.name = name;
@@ -42,11 +42,11 @@ public class Item {
         this.reserveRate = reserveRate;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -116,7 +116,7 @@ public class Item {
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (vendor != null ? vendor.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (unit != null ? unit.hashCode() : 0);
@@ -140,7 +140,7 @@ public class Item {
     }
 
     public static class Builder<T extends Builder<T>> {
-        private int id;
+        private String id;
         private String vendor;
         private String name = "";
         private String unit = "";
@@ -148,7 +148,7 @@ public class Item {
         private int amount;
         private int reserveRate;
 
-        public T id(int id) {
+        public T id(String id) {
             this.id = id;
             return self();
         }

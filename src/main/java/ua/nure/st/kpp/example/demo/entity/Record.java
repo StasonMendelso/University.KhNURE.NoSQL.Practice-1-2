@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Record {
-    private int id;
+    private String id;
     private String documentNumber;
     private Item item;
     private Company company;
@@ -13,7 +13,7 @@ public class Record {
     private BigDecimal price;
     private int amount;
 
-    public Record(int id, String documentNumber, Item item, Company company, LocalDateTime date, BigDecimal price, int amount) {
+    public Record(String id, String documentNumber, Item item, Company company, LocalDateTime date, BigDecimal price, int amount) {
         this.id = id;
         this.documentNumber = documentNumber;
         this.item = item;
@@ -33,11 +33,11 @@ public class Record {
         this.amount = builder.amount;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -108,7 +108,7 @@ public class Record {
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (documentNumber != null ? documentNumber.hashCode() : 0);
         result = 31 * result + (item != null ? item.hashCode() : 0);
         result = 31 * result + (company != null ? company.hashCode() : 0);
@@ -132,7 +132,7 @@ public class Record {
     }
 
     public static class Builder<T extends Builder<T>> {
-        private int id;
+        private String id;
         private String documentNumber = "";
         private Item item;
         private Company company;
@@ -140,7 +140,7 @@ public class Record {
         private BigDecimal price = BigDecimal.ZERO;
         private int amount;
 
-        public T id(int id) {
+        public T id(String id) {
             this.id = id;
             return self();
         }

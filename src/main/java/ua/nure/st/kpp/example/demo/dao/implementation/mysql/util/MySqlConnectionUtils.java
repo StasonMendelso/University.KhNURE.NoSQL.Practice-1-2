@@ -1,6 +1,6 @@
 package ua.nure.st.kpp.example.demo.dao.implementation.mysql.util;
 
-import ua.nure.st.kpp.example.demo.dao.DAOConfig;
+import ua.nure.st.kpp.example.demo.dao.MySqlDAOConfig;
 import ua.nure.st.kpp.example.demo.dao.DAOException;
 
 import java.sql.Connection;
@@ -11,7 +11,7 @@ import java.util.Properties;
 public class MySqlConnectionUtils {
     private final String url;
     private final Properties databaseProperties = new Properties();
-    public MySqlConnectionUtils(DAOConfig config) {
+    public MySqlConnectionUtils(MySqlDAOConfig config) {
         this.url = config.getUrl();
         databaseProperties.setProperty("user", config.getUser());
         databaseProperties.setProperty("password", config.getPassword());

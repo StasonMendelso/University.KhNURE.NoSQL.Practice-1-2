@@ -53,7 +53,7 @@ public class CompaniesController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editCompany(Model model, @PathVariable("id") int id) throws DAOException {
+    public String editCompany(Model model, @PathVariable("id") String id) throws DAOException {
         EditCompanyForm editCompanyForm = transformerService.toEditCompanyForm(companyDAO.read(id));
         model.addAttribute("editCompanyForm",editCompanyForm);
         return "companies/editCompany";
@@ -61,7 +61,7 @@ public class CompaniesController {
 
     @PatchMapping("/{id}")
     public String updateCompany(@ModelAttribute("editCompanyForm") @Validated EditCompanyForm editCompanyForm,
-                                BindingResult bindingResult, @PathVariable("id") int id) throws DAOException {
+                                BindingResult bindingResult, @PathVariable("id") String id) throws DAOException {
         if(bindingResult.hasErrors()){
             return "companies/editCompany";
         }

@@ -228,7 +228,7 @@ public class MySqlItemDAO implements ItemDAO {
         int amount = resultSet.getInt("amount");
         int reserveRate = resultSet.getInt("reserve_rate");
         return new Item.Builder<>()
-                .id(id)
+                .id(String.valueOf(id))
                 .name(name)
                 .vendor(vendor)
                 .weight(weight)

@@ -8,14 +8,14 @@ import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
 public class EditRecordForm {
-    private int id;
+    private String id;
     @NotEmpty(message = "The document number can't be empty")
     @Size(min = 2, max = 45, message = "The min and max size of the name is 2-45")
     private String documentNumber;
     @Positive(message = "The value must be positive integer")
-    private int itemId;
+    private String itemId;
     @Positive(message = "The value must be positive integer")
-    private int companyId;
+    private String companyId;
     @NotNull(message = "The price can't be empty")
     @PositiveOrZero(message = "The value must be positive or zero")
     //    @Pattern(regexp = "^\\d+\\.\\d+$", message = "The value must in format \"2.045\"") don't work
@@ -26,7 +26,7 @@ public class EditRecordForm {
     public EditRecordForm() {
     }
 
-    public EditRecordForm(int id, String documentNumber, int itemId, int companyId, BigDecimal price, int amount) {
+    public EditRecordForm(String id, String documentNumber, String itemId, String companyId, BigDecimal price, int amount) {
         this.id = id;
         this.documentNumber = documentNumber;
         this.itemId = itemId;
@@ -35,11 +35,11 @@ public class EditRecordForm {
         this.amount = amount;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -51,19 +51,19 @@ public class EditRecordForm {
         this.documentNumber = documentNumber;
     }
 
-    public int getItemId() {
+    public String getItemId() {
         return itemId;
     }
 
-    public void setItemId(int itemId) {
+    public void setItemId(String itemId) {
         this.itemId = itemId;
     }
 
-    public int getCompanyId() {
+    public String getCompanyId() {
         return companyId;
     }
 
-    public void setCompanyId(int companyId) {
+    public void setCompanyId(String companyId) {
         this.companyId = companyId;
     }
 

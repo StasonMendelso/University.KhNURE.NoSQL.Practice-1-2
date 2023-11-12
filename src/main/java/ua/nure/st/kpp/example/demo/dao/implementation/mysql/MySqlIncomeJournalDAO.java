@@ -47,7 +47,7 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
                 mapStatement(preparedStatement1, record);
 
                 preparedStatement2.setInt(1, record.getAmount());
-                preparedStatement2.setInt(2, record.getItem().getId());
+                preparedStatement2.setInt(2, Integer.parseInt(record.getItem().getId()));
 
                 preparedStatement1.execute();
                 preparedStatement2.executeUpdate();
@@ -94,7 +94,7 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
         int amount = resultSet.getInt("items.amount");
         int reserveRate = resultSet.getInt("items.reserve_rate");
         return new Item.Builder<>()
-                .id(id)
+                .id(String.valueOf(id))
                 .name(name)
                 .vendor(vendor)
                 .weight(weight)
@@ -110,7 +110,7 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
         String email = resultSet.getString("companies.email");
         String address = resultSet.getString("companies.address");
         return new Company.Builder<>()
-                .id(id)
+                .id(String.valueOf(id))
                 .name(name)
                 .email(email)
                 .address(address)
@@ -124,7 +124,7 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
         BigDecimal price = resultSet.getBigDecimal("income_journal.price");
         int amount = resultSet.getInt("amount");
         return new Record.Builder<>()
-                .id(id)
+                .id(String.valueOf(id))
                 .documentNumber(documentNumber)
                 .date(date)
                 .price(price)
@@ -154,7 +154,7 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
                         preparedStatement3.executeUpdate();
 
                         preparedStatement4.setInt(1, record.getAmount());
-                        preparedStatement4.setInt(2, record.getItem().getId());
+                        preparedStatement4.setInt(2, Integer.parseInt(record.getItem().getId()));
                         preparedStatement4.executeUpdate();
                         connection.commit();
                         return true;
@@ -174,8 +174,8 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
     private void mapUpdateStatement(PreparedStatement preparedStatement, int id, Record record) throws SQLException {
         int index = 1;
         preparedStatement.setString(index++, record.getDocumentNumber());
-        preparedStatement.setInt(index++, record.getItem().getId());
-        preparedStatement.setInt(index++, record.getCompany().getId());
+        preparedStatement.setInt(index++, Integer.parseInt(record.getItem().getId()));
+        preparedStatement.setInt(index++, Integer.parseInt(record.getCompany().getId()));
         preparedStatement.setBigDecimal(index++, record.getPrice());
         preparedStatement.setInt(index++, record.getAmount());
         preparedStatement.setInt(index, id);
@@ -184,8 +184,8 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
     private void mapStatement(PreparedStatement preparedStatement, Record record) throws SQLException {
         int index = 1;
         preparedStatement.setString(index++, record.getDocumentNumber());
-        preparedStatement.setInt(index++, record.getItem().getId());
-        preparedStatement.setInt(index++, record.getCompany().getId());
+        preparedStatement.setInt(index++, Integer.parseInt(record.getItem().getId()));
+        preparedStatement.setInt(index++, Integer.parseInt(record.getCompany().getId()));
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         preparedStatement.setTimestamp(index++, Timestamp.valueOf(record.getDate().format(dateTimeFormatter)));
         preparedStatement.setBigDecimal(index++, record.getPrice());

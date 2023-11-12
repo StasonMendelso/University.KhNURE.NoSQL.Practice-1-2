@@ -7,7 +7,7 @@ import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
 public class EditItemForm {
-    private int id;
+    private String id;
     @NotEmpty(message = "The vendor can't be empty")
     @Size(min = 2, max = 20, message = "The min and max size of the vendor is 2-20")
     private String vendor;
@@ -27,7 +27,7 @@ public class EditItemForm {
     public EditItemForm() {
     }
 
-    public EditItemForm(int id, String vendor, String name, String unit, BigDecimal weight, int reserveRate) {
+    public EditItemForm(String id, String vendor, String name, String unit, BigDecimal weight, int reserveRate) {
         this.id = id;
         this.vendor = vendor;
         this.name = name;
@@ -76,11 +76,11 @@ public class EditItemForm {
         this.reserveRate = reserveRate;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

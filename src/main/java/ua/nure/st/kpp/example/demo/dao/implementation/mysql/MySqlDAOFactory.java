@@ -1,7 +1,7 @@
 package ua.nure.st.kpp.example.demo.dao.implementation.mysql;
 
 import ua.nure.st.kpp.example.demo.dao.CompanyDAO;
-import ua.nure.st.kpp.example.demo.dao.DAOConfig;
+import ua.nure.st.kpp.example.demo.dao.MySqlDAOConfig;
 import ua.nure.st.kpp.example.demo.dao.Factory;
 import ua.nure.st.kpp.example.demo.dao.IncomeJournalDAO;
 import ua.nure.st.kpp.example.demo.dao.ItemDAO;
@@ -11,7 +11,7 @@ import ua.nure.st.kpp.example.demo.dao.implementation.mysql.util.MySqlConnection
 public class MySqlDAOFactory implements Factory {
     private final MySqlConnectionUtils mySqlConnectionUtils;
 
-    public MySqlDAOFactory(DAOConfig config) {
+    public MySqlDAOFactory(MySqlDAOConfig config) {
         this.mySqlConnectionUtils = new MySqlConnectionUtils(config);
     }
 

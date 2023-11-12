@@ -3,12 +3,12 @@ package ua.nure.st.kpp.example.demo.entity;
 import java.util.Objects;
 
 public class Company {
-    private int id;
+    private String id;
     private String name;
     private String email;
     private String address;
 
-    public Company(int id, String name, String email, String address) {
+    public Company(String id, String name, String email, String address) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -26,11 +26,11 @@ public class Company {
 
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -73,7 +73,7 @@ public class Company {
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (address != null ? address.hashCode() : 0);
@@ -91,12 +91,12 @@ public class Company {
     }
 
     public static class Builder<T extends Builder<T>> {
-        private int id;
+        private String id;
         private String name = "";
         private String email = "";
         private String address = "";
 
-        public T id(int id) {
+        public T id(String id) {
             this.id = id;
             return self();
         }

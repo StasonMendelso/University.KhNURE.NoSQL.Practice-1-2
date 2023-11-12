@@ -8,8 +8,8 @@ import java.util.List;
 public interface CompanyDAO {
     boolean create(Company company) throws DAOException;
     List<Company> readAll() throws DAOException;
-    boolean update(int id, Company company) throws DAOException;
-    Company read(int id) throws DAOException;
+    boolean update(String id, Company company) throws DAOException;
+    Company read(String id) throws DAOException;
 
-    List<Integer> readAllAvailableId() throws DAOException;
+    List<String> readAllAvailableId() throws DAOException;
 }
