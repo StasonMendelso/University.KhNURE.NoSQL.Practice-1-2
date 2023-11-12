@@ -12,9 +12,7 @@ public class EditRecordForm {
     @NotEmpty(message = "The document number can't be empty")
     @Size(min = 2, max = 45, message = "The min and max size of the name is 2-45")
     private String documentNumber;
-    @Positive(message = "The value must be positive integer")
     private String itemId;
-    @Positive(message = "The value must be positive integer")
     private String companyId;
     @NotNull(message = "The price can't be empty")
     @PositiveOrZero(message = "The value must be positive or zero")

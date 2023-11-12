@@ -133,7 +133,7 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
     }
 
     @Override
-    public boolean updateRecord(int id, Record record) throws DAOException {
+    public boolean updateRecord(String id, Record record) throws DAOException {
         Connection connection = null;
         try {
             connection = mySqlConnectionUtils.getConnection(true);
@@ -141,7 +141,7 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
                  PreparedStatement preparedStatement2 = connection.prepareStatement(Query.UPDATE_ITEM_QUANTITY_SUBTRACTING_VALUE_BY_ID);
                  PreparedStatement preparedStatement3 = connection.prepareStatement(Query.UPDATE_RECORD);
                  PreparedStatement preparedStatement4 = connection.prepareStatement(Query.UPDATE_ITEM_QUANTITY_ADDING_VALUE_BY_ID)) {
-                preparedStatement1.setInt(1, id);
+                preparedStatement1.setInt(1, Integer.parseInt(id));
                 try (ResultSet resultSet = preparedStatement1.executeQuery()) {
                     if (resultSet.next()) {
                         int oldRecordAmount = resultSet.getInt("amount");
@@ -171,14 +171,14 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
         return false;
     }
 
-    private void mapUpdateStatement(PreparedStatement preparedStatement, int id, Record record) throws SQLException {
+    private void mapUpdateStatement(PreparedStatement preparedStatement, String id, Record record) throws SQLException {
         int index = 1;
         preparedStatement.setString(index++, record.getDocumentNumber());
         preparedStatement.setInt(index++, Integer.parseInt(record.getItem().getId()));
         preparedStatement.setInt(index++, Integer.parseInt(record.getCompany().getId()));
         preparedStatement.setBigDecimal(index++, record.getPrice());
         preparedStatement.setInt(index++, record.getAmount());
-        preparedStatement.setInt(index, id);
+        preparedStatement.setInt(index, Integer.parseInt(id));
     }
 
     private void mapStatement(PreparedStatement preparedStatement, Record record) throws SQLException {
@@ -194,14 +194,14 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
 
 
     @Override
-    public boolean deleteRecord(int id) throws DAOException {
+    public boolean deleteRecord(String id) throws DAOException {
         Connection connection = null;
         try {
             connection = mySqlConnectionUtils.getConnection(true);
             try (PreparedStatement preparedStatement1 = connection.prepareStatement(Query.GET_RECORD);
                  PreparedStatement preparedStatement2 = connection.prepareStatement(Query.UPDATE_ITEM_QUANTITY_SUBTRACTING_VALUE_BY_ID);
                  PreparedStatement preparedStatement3 = connection.prepareStatement(Query.DELETE_RECORD)) {
-                preparedStatement1.setInt(1, id);
+                preparedStatement1.setInt(1, Integer.parseInt(id));
                 try (ResultSet resultSet = preparedStatement1.executeQuery()) {
                     if (resultSet.next()) {
                         int amount = resultSet.getInt("amount");
@@ -209,7 +209,7 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
                         preparedStatement2.setInt(1, amount);
                         preparedStatement2.setInt(2, itemId);
                         preparedStatement2.executeUpdate();
-                        preparedStatement3.setInt(1, id);
+                        preparedStatement3.setInt(1, Integer.parseInt(id));
 
                         preparedStatement3.executeUpdate();
                         connection.commit();
@@ -226,10 +226,10 @@ public class MySqlIncomeJournalDAO implements IncomeJournalDAO {
     }
 
     @Override
-    public Record read(int id) throws DAOException {
+    public Record read(String id) throws DAOException {
         try (Connection connection = mySqlConnectionUtils.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(Query.GET_RECORD)) {
-            preparedStatement.setInt(1, id);
+            preparedStatement.setInt(1, Integer.parseInt(id));
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     Record record = mapRecord(resultSet);

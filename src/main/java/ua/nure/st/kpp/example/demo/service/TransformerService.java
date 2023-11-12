@@ -11,6 +11,8 @@ import ua.nure.st.kpp.example.demo.form.item.EditItemForm;
 import ua.nure.st.kpp.example.demo.form.journal.AddRecordForm;
 import ua.nure.st.kpp.example.demo.form.journal.EditRecordForm;
 
+import java.time.LocalDateTime;
+
 @Service
 public class TransformerService {
     public EditItemForm toEditItemForm(Item item) {
@@ -91,6 +93,7 @@ public class TransformerService {
                 .amount(addRecordForm.getAmount())
                 .item(item)
                 .company(company)
+                .date(LocalDateTime.now())
                 .build();
     }
 
@@ -105,6 +108,7 @@ public class TransformerService {
                 .amount(editRecordForm.getAmount())
                 .item(item)
                 .company(company)
+                .date(LocalDateTime.now())
                 .build();
     }
 }

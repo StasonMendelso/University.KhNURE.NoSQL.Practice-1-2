@@ -9,9 +9,9 @@ public interface JournalDAO {
 
     Journal readAll() throws DAOException;
 
-    boolean updateRecord(int id, Record record) throws DAOException;
+    boolean updateRecord(String id, Record record) throws DAOException;
 
-    boolean deleteRecord(int id) throws DAOException;
+    boolean deleteRecord(String id) throws DAOException;
 
-    Record read(int id) throws DAOException;
+    Record read(String id) throws DAOException;
 }

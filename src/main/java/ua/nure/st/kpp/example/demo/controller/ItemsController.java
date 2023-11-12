@@ -65,7 +65,7 @@ public class ItemsController {
 
 	@GetMapping("/{id}/edit")
 	public String editItem(Model model, @PathVariable("id") String id) throws DAOException {
-		EditItemForm editItemForm = transformerService.toEditItemForm(itemDAO.readByVendor(id));
+		EditItemForm editItemForm = transformerService.toEditItemForm(itemDAO.readById(id));
 		model.addAttribute("editItemForm", editItemForm);
 		return "items/editItem";
 	}

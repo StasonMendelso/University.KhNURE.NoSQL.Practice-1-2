@@ -46,7 +46,7 @@ public class OutcomeJournalController {
     }
 
     @GetMapping("/{id}")
-    public String showRecord(Model model, @PathVariable("id") int id) throws DAOException {
+    public String showRecord(Model model, @PathVariable("id") String id) throws DAOException {
         model.addAttribute("record", outcomeJournalDAO.read(id));
         return "journals/showRecord";
     }
@@ -72,7 +72,7 @@ public class OutcomeJournalController {
 
 
     @GetMapping("/{id}/edit")
-    public String editRecord(Model model, @PathVariable("id") int id) throws DAOException {
+    public String editRecord(Model model, @PathVariable("id") String id) throws DAOException {
         EditRecordForm editRecordForm = transformerService.toEditRecordForm(outcomeJournalDAO.read(id));
         model.addAttribute("editRecordForm", editRecordForm);
         addIdAttributes(model);
@@ -81,7 +81,7 @@ public class OutcomeJournalController {
 
     @PatchMapping("/{id}")
     public String updateRecord(Model model, @ModelAttribute("editRecordForm") @Validated EditRecordForm editRecordForm,
-                               BindingResult bindingResult, @PathVariable("id") int id) throws DAOException {
+                               BindingResult bindingResult, @PathVariable("id") String id) throws DAOException {
         if (bindingResult.hasErrors()) {
             addIdAttributes(model);
             return "journals/outcome/editRecord";
@@ -92,7 +92,7 @@ public class OutcomeJournalController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteRecord(@PathVariable("id") int id) throws DAOException {
+    public String deleteRecord(@PathVariable("id") String id) throws DAOException {
         outcomeJournalDAO.deleteRecord(id);
         return "redirect:/journal/outcome";
     }

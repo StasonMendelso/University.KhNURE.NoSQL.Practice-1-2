@@ -11,10 +11,11 @@ import ua.nure.st.kpp.example.demo.dao.*;
  */
 public class MongoDbDaoFactory implements Factory {
     private final MongoDatabase mongoDatabase;
+    private final MongoClient mongoClient;
 
     public MongoDbDaoFactory(MongoDbDAOConfig mongoDbDAOConfig) {
         ConnectionString connectionString = new ConnectionString(mongoDbDAOConfig.getConnectionString());
-        MongoClient mongoClient = MongoClients.create(connectionString);
+        this.mongoClient = MongoClients.create(connectionString);
         this.mongoDatabase = mongoClient.getDatabase(mongoDbDAOConfig.getName());
 
         //При завершенні програми закриваємо mongoClient з'єднання
@@ -34,11 +35,11 @@ public class MongoDbDaoFactory implements Factory {
 
     @Override
     public IncomeJournalDAO createIncomeJournalDAO() {
-        return new MongoDbIncomeJournalDAO();
+        return new MongoDbIncomeJournalDAO(mongoClient,mongoDatabase);
     }
 
     @Override
     public OutcomeJournalDAO createOutcomeJournalDAO() {
-        return new MongoDbOutcomeJournalDAO();
+        return new MongoDbOutcomeJournalDAO(mongoClient,mongoDatabase);
     }
 }
