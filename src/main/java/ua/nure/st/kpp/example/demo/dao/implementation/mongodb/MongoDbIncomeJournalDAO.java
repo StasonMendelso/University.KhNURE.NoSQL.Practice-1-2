@@ -48,7 +48,9 @@ public class MongoDbIncomeJournalDAO implements IncomeJournalDAO {
         try {
             clientSession.startTransaction();
 
-            UpdateResult updateResult = itemCollection.updateOne(clientSession, eq("_id", new ObjectId(record.getItem().getId())), Updates.inc("amount", record.getAmount()));
+            UpdateResult updateResult = itemCollection.updateOne(clientSession,
+                    eq("_id", new ObjectId(record.getItem().getId())),
+                    Updates.inc("amount", record.getAmount()));
             if (updateResult.getModifiedCount() == 0) {
                 clientSession.abortTransaction();
                 return false;

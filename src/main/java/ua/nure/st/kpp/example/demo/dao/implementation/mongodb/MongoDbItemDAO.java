@@ -12,6 +12,7 @@ import ua.nure.st.kpp.example.demo.dao.ItemDAO;
 import ua.nure.st.kpp.example.demo.entity.Item;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,12 +83,29 @@ public class MongoDbItemDAO implements ItemDAO {
         return itemList;
     }
 
+    @Override
+    public List<Item> readByNameAndAmount(String name, int minAmount, int maxAmount) throws DAOException {
+        List<Item> itemList = new ArrayList<>();
+        FindIterable<Document> documents = itemCollection.find(and(
+                regex("name",name),
+                gte("amount", minAmount),
+                lte("amount", maxAmount)
+        ));
+        try (MongoCursor<Document> cursor = documents.cursor()) {
+            while (cursor.hasNext()) {
+                Document document = cursor.next();
+                itemList.add(mapToItem(document));
+            }
+        }
+        return itemList;
+    }
+
     private Item mapToItem(Document document) {
         return new Item.Builder()
                 .id(document.getObjectId("_id").toString())
                 .vendor(document.getString("vendor"))
                 .unit(document.getString("unit"))
-                .weight(BigDecimal.valueOf(document.getDouble("weight")))
+                .weight(BigDecimal.valueOf(document.getDouble("weight")).setScale(4, RoundingMode.FLOOR))
                 .amount(document.getInteger("amount"))
                 .name(document.getString("name"))
                 .reserveRate(document.getInteger("reserve_rate"))

@@ -14,6 +14,10 @@ public class MongoDbDAOConfig {
     public MongoDbDAOConfig() {
     }
 
+    public MongoDbDAOConfig(String connectionString, String name) {
+        this.connectionString = connectionString;
+        this.name = name;
+    }
 
     public String getConnectionString() {
         return connectionString;

@@ -105,7 +105,6 @@ public class Item {
 
         Item item = (Item) o;
 
-        if (id != item.id) return false;
         if (amount != item.amount) return false;
         if (reserveRate != item.reserveRate) return false;
         if (!Objects.equals(vendor, item.vendor)) return false;
@@ -116,8 +115,7 @@ public class Item {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (vendor != null ? vendor.hashCode() : 0);
+        int result = vendor != null ? vendor.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (unit != null ? unit.hashCode() : 0);
         result = 31 * result + (weight != null ? weight.hashCode() : 0);

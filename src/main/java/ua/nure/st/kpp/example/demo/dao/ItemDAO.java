@@ -13,6 +13,7 @@ public interface ItemDAO {
     boolean update(String id, Item item) throws DAOException;
 
     List<Item> readAll() throws DAOException;
+    List<Item> readByNameAndAmount(String name, int minAmount, int maxAmount) throws DAOException;
 
     Item readByVendor(String vendor) throws DAOException;
 
