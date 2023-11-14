@@ -42,14 +42,16 @@ public class MySqlItemDAO implements ItemDAO {
     }
 
     @Override
-    public boolean create(Item item) throws DAOException {
+    public Item create(Item item) throws DAOException {
         try (Connection connection = mySqlConnectionUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(Query.INSERT_ITEM)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(Query.INSERT_ITEM, Statement.RETURN_GENERATED_KEYS)) {
             int unitId = getUnitId(item, connection);
             mapInsertStatement(preparedStatement, item, unitId);
 
             preparedStatement.execute();
-            return true;
+            ResultSet keys = preparedStatement.getGeneratedKeys();
+            keys.next();
+            return readById(keys.getString(1));
         } catch (SQLException exception) {
             throw new DAOException(exception);
         }

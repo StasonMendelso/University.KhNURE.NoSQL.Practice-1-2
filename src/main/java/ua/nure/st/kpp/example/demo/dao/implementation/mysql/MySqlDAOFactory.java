@@ -9,30 +9,37 @@ import ua.nure.st.kpp.example.demo.dao.OutcomeJournalDAO;
 import ua.nure.st.kpp.example.demo.dao.implementation.mysql.util.MySqlConnectionUtils;
 
 public class MySqlDAOFactory implements Factory {
-    private final MySqlConnectionUtils mySqlConnectionUtils;
+    private final MySqlItemDAO mySqlItemDAO;
+    private final MySqlCompanyDAO mySqlCompanyDAO;
+    private final MySqlIncomeJournalDAO mySqlIncomeJournalDAO;
+    private final MySqlOutcomeJournalDAO mySqlOutcomeJournalDAO;
 
     public MySqlDAOFactory(MySqlDAOConfig config) {
-        this.mySqlConnectionUtils = new MySqlConnectionUtils(config);
+        MySqlConnectionUtils mySqlConnectionUtils = new MySqlConnectionUtils(config);
+        this.mySqlItemDAO = new MySqlItemDAO(mySqlConnectionUtils);
+        this.mySqlCompanyDAO = new MySqlCompanyDAO(mySqlConnectionUtils);
+        this.mySqlIncomeJournalDAO = new MySqlIncomeJournalDAO(mySqlConnectionUtils);
+        this.mySqlOutcomeJournalDAO = new MySqlOutcomeJournalDAO(mySqlConnectionUtils);
     }
 
     @Override
     public ItemDAO createItemDAO() {
-        return new MySqlItemDAO(mySqlConnectionUtils);
+        return mySqlItemDAO;
     }
 
     @Override
     public CompanyDAO createCompanyDAO() {
-        return new MySqlCompanyDAO(mySqlConnectionUtils);
+        return mySqlCompanyDAO;
     }
 
     @Override
     public IncomeJournalDAO createIncomeJournalDAO() {
-        return new MySqlIncomeJournalDAO(mySqlConnectionUtils);
+        return mySqlIncomeJournalDAO;
     }
 
     @Override
     public OutcomeJournalDAO createOutcomeJournalDAO() {
-        return new MySqlOutcomeJournalDAO(mySqlConnectionUtils);
+        return mySqlOutcomeJournalDAO;
     }
 
 }

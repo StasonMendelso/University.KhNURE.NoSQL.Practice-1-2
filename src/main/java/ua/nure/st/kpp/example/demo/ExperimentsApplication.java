@@ -51,7 +51,7 @@ public class ExperimentsApplication {
         mySqlConnectionUtils = new MySqlConnectionUtils(config);
         mySqlItemDao = mySqlDAOFactory.createItemDAO();
 
-        MongoDbDAOConfig mongoDbDAOConfig = new MongoDbDAOConfig("mongodb://localhost:27002", "warehouse");
+        MongoDbDAOConfig mongoDbDAOConfig = new MongoDbDAOConfig("mongodb://localhost:27017", "warehouse");
         MongoDbDaoFactory mongoDbDaoFactory = new MongoDbDaoFactory(mongoDbDAOConfig);
         mongoClient = MongoClients.create(new ConnectionString(mongoDbDAOConfig.getConnectionString()));
         mongoDbItemDao = mongoDbDaoFactory.createItemDAO();
@@ -59,17 +59,19 @@ public class ExperimentsApplication {
 
     public static void main(String[] args) throws SQLException {
         clearDatabases();
+        int[] sizes = {100,1000,10000,50000,100000,500000};
 
+        for (int size : sizes) {
+            System.out.println("==========================================");
+            String name = "Nails";
+            int minAmount = 20;
+            int maxAmount = 50;
+            System.out.println("[MAIN] - " + "Dataset size is " + size + ".Search with parameters: name = " + name + ", minAmount = " + minAmount + ", maxAmount = " + maxAmount);
+            List<Item> itemList = experimentInsert(size);
+            experimentSelectByNameAndAmount(itemList, name, minAmount, maxAmount);
 
-        int size = 100;
-        String name = "Nails";
-        int minAmount = 20;
-        int maxAmount = 50;
-        System.out.println("[MAIN] - " + "Dataset size is " + size + ".Search with parameters: name = " + name + ", minAmount = " + minAmount + ", maxAmount = " + maxAmount);
-        List<Item> itemList = experimentInsert(size);
-        experimentSelectByNameAndAmount(itemList, name, minAmount, maxAmount);
-
-        clearDatabases();
+            clearDatabases();
+        }
     }
 
     private static void clearDatabases() throws SQLException {

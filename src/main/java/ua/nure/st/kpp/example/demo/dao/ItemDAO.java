@@ -6,7 +6,7 @@ import ua.nure.st.kpp.example.demo.entity.Item;
 import java.util.List;
 @Repository
 public interface ItemDAO {
-    boolean create(Item item) throws DAOException;
+    Item create(Item item) throws DAOException;
 
     boolean updateQuantity(String id, int quantity) throws DAOException;
 

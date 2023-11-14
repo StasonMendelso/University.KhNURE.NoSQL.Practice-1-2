@@ -115,13 +115,12 @@ public class MongoDbOutcomeJournalDAO implements OutcomeJournalDAO {
 
     private List<Record> mapToRecordList(Document document) {
         List<Record> result = new ArrayList<>();
-        Item item = mapToItem(document);
 
         List<Document> documentList = document.getList("outcome_journal", Document.class);
         Iterator<Document> iterator = documentList.iterator();
         while (iterator.hasNext()) {
             Record record = getRecord(iterator.next());
-            record.setItem(item);
+            record.setItem(mapToItem(document));
             result.add(record);
         }
 

@@ -10,13 +10,20 @@ import ua.nure.st.kpp.example.demo.dao.*;
  * @author Stanislav Hlova
  */
 public class MongoDbDaoFactory implements Factory {
-    private final MongoDatabase mongoDatabase;
-    private final MongoClient mongoClient;
+    private final MongoDbItemDAO mongoDbItemDAO;
+    private final MongoDbCompanyDAO mongoDbCompanyDAO;
+    private final MongoDbIncomeJournalDAO mongoDbIncomeJournalDAO;
+    private final MongoDbOutcomeJournalDAO mongoDbOutcomeJournalDAO;
 
     public MongoDbDaoFactory(MongoDbDAOConfig mongoDbDAOConfig) {
         ConnectionString connectionString = new ConnectionString(mongoDbDAOConfig.getConnectionString());
-        this.mongoClient = MongoClients.create(connectionString);
-        this.mongoDatabase = mongoClient.getDatabase(mongoDbDAOConfig.getName());
+        MongoClient mongoClient = MongoClients.create(connectionString);
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(mongoDbDAOConfig.getName());
+
+        this.mongoDbItemDAO = new MongoDbItemDAO(mongoDatabase);
+        this.mongoDbCompanyDAO = new MongoDbCompanyDAO(mongoDatabase);
+        this.mongoDbIncomeJournalDAO = new MongoDbIncomeJournalDAO(mongoClient, mongoDatabase);
+        this.mongoDbOutcomeJournalDAO = new MongoDbOutcomeJournalDAO(mongoClient, mongoDatabase);
 
         //При завершенні програми закриваємо mongoClient з'єднання
         //Примітка: дана реалізація може спрацювати не завжди в силу реалізації виконання програми
@@ -25,21 +32,21 @@ public class MongoDbDaoFactory implements Factory {
 
     @Override
     public ItemDAO createItemDAO() {
-        return new MongoDbItemDAO(mongoDatabase);
+        return mongoDbItemDAO;
     }
 
     @Override
     public CompanyDAO createCompanyDAO() {
-        return new MongoDbCompanyDAO(mongoDatabase);
+        return mongoDbCompanyDAO;
     }
 
     @Override
     public IncomeJournalDAO createIncomeJournalDAO() {
-        return new MongoDbIncomeJournalDAO(mongoClient,mongoDatabase);
+        return mongoDbIncomeJournalDAO;
     }
 
     @Override
     public OutcomeJournalDAO createOutcomeJournalDAO() {
-        return new MongoDbOutcomeJournalDAO(mongoClient,mongoDatabase);
+        return mongoDbOutcomeJournalDAO;
     }
 }

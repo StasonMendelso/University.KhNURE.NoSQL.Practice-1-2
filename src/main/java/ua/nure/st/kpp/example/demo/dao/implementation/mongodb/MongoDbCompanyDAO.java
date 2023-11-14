@@ -32,9 +32,10 @@ public class MongoDbCompanyDAO implements CompanyDAO {
     }
 
     @Override
-    public boolean create(Company company) throws DAOException {
-        companyCollection.insertOne(mapToDocument(company));
-        return true;
+    public Company create(Company company) throws DAOException {
+        Document document = mapToDocument(company);
+        companyCollection.insertOne(document);
+        return read(document.getObjectId("_id").toString());
     }
 
     @Override

@@ -30,16 +30,18 @@ public class MySqlCompanyDAO implements CompanyDAO {
     }
 
     @Override
-    public boolean create(Company company) throws DAOException {
+    public Company create(Company company) throws DAOException {
         try (Connection connection = mySqlConnectionUtils.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(Query.INSERT_COMPANY)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(Query.INSERT_COMPANY, Statement.RETURN_GENERATED_KEYS)) {
             int index = 1;
             preparedStatement.setString(index++, company.getName());
             preparedStatement.setString(index++, company.getEmail());
             preparedStatement.setString(index, company.getAddress());
 
             preparedStatement.execute();
-            return true;
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+            generatedKeys.next();
+            return read(generatedKeys.getString(1));
         } catch (SQLException exception) {
             throw new DAOException(exception);
         }

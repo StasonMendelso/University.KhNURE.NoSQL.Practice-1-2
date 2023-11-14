@@ -35,9 +35,10 @@ public class MongoDbItemDAO implements ItemDAO {
 
 
     @Override
-    public boolean create(Item item) throws DAOException {
-        itemCollection.insertOne(mapToDocument(item));
-        return true;
+    public Item create(Item item) throws DAOException {
+        Document document = mapToDocument(item);
+        itemCollection.insertOne(document);
+        return readById(document.getObjectId("_id").toString());
     }
 
     private Document mapToDocument(Item item) {
@@ -87,7 +88,7 @@ public class MongoDbItemDAO implements ItemDAO {
     public List<Item> readByNameAndAmount(String name, int minAmount, int maxAmount) throws DAOException {
         List<Item> itemList = new ArrayList<>();
         FindIterable<Document> documents = itemCollection.find(and(
-                regex("name",name),
+                regex("name", name),
                 gte("amount", minAmount),
                 lte("amount", maxAmount)
         ));

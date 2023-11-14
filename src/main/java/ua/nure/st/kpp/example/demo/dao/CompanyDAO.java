@@ -6,7 +6,7 @@ import ua.nure.st.kpp.example.demo.entity.Company;
 import java.util.List;
 @Service
 public interface CompanyDAO {
-    boolean create(Company company) throws DAOException;
+    Company create(Company company) throws DAOException;
     List<Company> readAll() throws DAOException;
     boolean update(String id, Company company) throws DAOException;
     Company read(String id) throws DAOException;
