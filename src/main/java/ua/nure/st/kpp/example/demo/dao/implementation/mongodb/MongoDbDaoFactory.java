@@ -1,10 +1,12 @@
 package ua.nure.st.kpp.example.demo.dao.implementation.mongodb;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
 import ua.nure.st.kpp.example.demo.dao.*;
+
+import java.util.List;
 
 /**
  * @author Stanislav Hlova
@@ -16,8 +18,16 @@ public class MongoDbDaoFactory implements Factory {
     private final MongoDbOutcomeJournalDAO mongoDbOutcomeJournalDAO;
 
     public MongoDbDaoFactory(MongoDbDAOConfig mongoDbDAOConfig) {
-        ConnectionString connectionString = new ConnectionString(mongoDbDAOConfig.getConnectionString());
-        MongoClient mongoClient = MongoClients.create(connectionString);
+        MongoClient mongoClient;
+        if (mongoDbDAOConfig.isReplicaSet()) {
+            List<ServerAddress> serverAddresses = mongoDbDAOConfig.getServerAddress().stream()
+                    .map(serverAddressProperties -> new ServerAddress(serverAddressProperties.getHost(), serverAddressProperties.getPort()))
+                    .toList();
+            mongoClient = new MongoClient(serverAddresses);
+        } else {
+            mongoClient = new MongoClient(new MongoClientURI(mongoDbDAOConfig.getConnectionString()));
+        }
+
         MongoDatabase mongoDatabase = mongoClient.getDatabase(mongoDbDAOConfig.getName());
 
         this.mongoDbItemDAO = new MongoDbItemDAO(mongoDatabase);
@@ -27,7 +37,9 @@ public class MongoDbDaoFactory implements Factory {
 
         //При завершенні програми закриваємо mongoClient з'єднання
         //Примітка: дана реалізація може спрацювати не завжди в силу реалізації виконання програми
-        Runtime.getRuntime().addShutdownHook(new Thread(mongoClient::close));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Closing MongoClient: " + mongoClient);
+            mongoClient.close();}));
     }
 
     @Override

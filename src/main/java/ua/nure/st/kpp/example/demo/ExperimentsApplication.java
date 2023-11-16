@@ -51,7 +51,9 @@ public class ExperimentsApplication {
         mySqlConnectionUtils = new MySqlConnectionUtils(config);
         mySqlItemDao = mySqlDAOFactory.createItemDAO();
 
-        MongoDbDAOConfig mongoDbDAOConfig = new MongoDbDAOConfig("mongodb://localhost:27017", "warehouse");
+        MongoDbDAOConfig mongoDbDAOConfig = new MongoDbDAOConfig();
+        mongoDbDAOConfig.setConnectionString("mongodb://localhost:27017");
+        mongoDbDAOConfig.setName("warehouse");
         MongoDbDaoFactory mongoDbDaoFactory = new MongoDbDaoFactory(mongoDbDAOConfig);
         mongoClient = MongoClients.create(new ConnectionString(mongoDbDAOConfig.getConnectionString()));
         mongoDbItemDao = mongoDbDaoFactory.createItemDAO();

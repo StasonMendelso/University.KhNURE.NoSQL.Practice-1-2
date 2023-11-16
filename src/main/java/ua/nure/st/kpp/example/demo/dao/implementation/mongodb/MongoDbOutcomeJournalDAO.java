@@ -1,5 +1,6 @@
 package ua.nure.st.kpp.example.demo.dao.implementation.mongodb;
 
+import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;

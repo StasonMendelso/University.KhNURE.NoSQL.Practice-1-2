@@ -1,0 +1,17 @@
+database:
+  type: MongoDB
+  mongodb:
+    connection_string: mongodb://localhost:27017
+    name: warehouse
+    replica_set: true
+    server_address:
+      - host: localhost
+        port: 27001
+      - host: localhost
+        port: 27002
+      - host: localhost
+        port: 27003
+  mysql:
+    password: root
+    url: jdbc:mysql://localhost:3306/warehousecpp
+    user: root
