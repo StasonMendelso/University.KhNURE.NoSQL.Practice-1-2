@@ -1,5 +1,9 @@
 package ua.nure.st.kpp.example.demo.dao.implementation.mongodb;
 
+import com.mongodb.MongoNotPrimaryException;
+import com.mongodb.MongoWriteConcernException;
+import com.mongodb.MongoWriteException;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -23,56 +27,84 @@ import static com.mongodb.client.model.Updates.*;
 /**
  * @author Stanislav Hlova
  */
-public class MongoDbItemDAO implements ItemDAO {
-
+public class MongoDbItemDAO implements ItemDAO, MongoDbDAO {
+    private final MongoTimeoutProperties mongoTimeoutProperties;
     private final MongoDatabase mongoDatabase;
     private final MongoCollection<Document> itemCollection;
 
-    public MongoDbItemDAO(MongoDatabase mongoDatabase) {
+    public MongoDbItemDAO(MongoTimeoutProperties mongoTimeoutProperties, MongoDatabase mongoDatabase) {
+        this.mongoTimeoutProperties = mongoTimeoutProperties;
         this.mongoDatabase = mongoDatabase;
         this.itemCollection = mongoDatabase.getCollection("item");
     }
-
+    public MongoDbItemDAO(MongoTimeoutProperties mongoTimeoutProperties, MongoDatabase mongoDatabase, WriteConcern writeConcern) {
+        this.mongoTimeoutProperties = mongoTimeoutProperties;
+        this.mongoDatabase = mongoDatabase;
+        this.itemCollection = mongoDatabase.getCollection("item").withWriteConcern(writeConcern);
+    }
 
     @Override
     public Item create(Item item) throws DAOException {
         Document document = mapToDocument(item);
-        itemCollection.insertOne(document);
-        return readById(document.getObjectId("_id").toString());
+        int count = 0;
+        while (true) {
+            try {
+                itemCollection.insertOne(document);
+            } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
+                if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
+                    throw new DAOException(exception);
+                }
+                count++;
+                sleep(mongoTimeoutProperties.getWaitReconnectDuration());
+                System.out.println("Trying to insert an item again!!");
+                continue;
+            }
+            return readById(document.getObjectId("_id").toString());
+        }
     }
 
-    private Document mapToDocument(Item item) {
-        return new Document()
-                .append("vendor", item.getVendor())
-                .append("name", item.getName())
-                .append("unit", item.getUnit())
-                .append("weight", item.getWeight().doubleValue())
-                .append("amount", item.getAmount())
-                .append("reserve_rate", item.getReserveRate())
-                .append("income_journal", new ArrayList<>())
-                .append("outcome_journal", new ArrayList<>());
+    protected Document mapToDocument(Item item) {
+        return new Document().append("vendor", item.getVendor()).append("name", item.getName()).append("unit", item.getUnit()).append("weight", item.getWeight().doubleValue()).append("amount", item.getAmount()).append("reserve_rate", item.getReserveRate()).append("income_journal", new ArrayList<>()).append("outcome_journal", new ArrayList<>());
     }
 
     @Override
-    public boolean updateQuantity(String id, int quantity) {
-        UpdateResult updateResult = itemCollection.updateOne(eq("_id", new ObjectId(id)), set("amount", quantity));
-        return updateResult.getModifiedCount() > 0;
+    public boolean updateQuantity(String id, int quantity) throws DAOException {
+        int count = 0;
+        while (true) {
+            try {
+                UpdateResult updateResult = itemCollection.updateOne(eq("_id", new ObjectId(id)), set("amount", quantity));
+                return updateResult.getModifiedCount() > 0;
+            } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
+                if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
+                    throw new DAOException(exception);
+                }
+                count++;
+                sleep(mongoTimeoutProperties.getWaitReconnectDuration());
+            }
+        }
+
     }
 
     @Override
     public boolean update(String id, Item item) throws DAOException {
-        UpdateResult updateResult = itemCollection.updateOne(eq("_id", new ObjectId(id)), combine(
-                set("vendor", item.getVendor()),
-                set("name", item.getName()),
-                set("unit", item.getUnit()),
-                set("weight", item.getWeight().doubleValue()),
-                set("amount", item.getAmount()),
-                set("reserve_rate", item.getReserveRate())));
-        return updateResult.getModifiedCount() > 0;
+        int count = 0;
+        while (true) {
+            try {
+                UpdateResult updateResult = itemCollection.updateOne(eq("_id", new ObjectId(id)), combine(set("vendor", item.getVendor()), set("name", item.getName()), set("unit", item.getUnit()), set("weight", item.getWeight().doubleValue()), set("amount", item.getAmount()), set("reserve_rate", item.getReserveRate())));
+                return updateResult.getModifiedCount() > 0;
+            } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
+                if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
+                    throw new DAOException(exception);
+                }
+                count++;
+                sleep(mongoTimeoutProperties.getWaitReconnectDuration());
+            }
+        }
     }
 
     @Override
     public List<Item> readAll() throws DAOException {
+
         List<Item> itemList = new ArrayList<>();
         FindIterable<Document> documents = itemCollection.find(exists("amount"));
         try (MongoCursor<Document> cursor = documents.cursor()) {
@@ -87,11 +119,7 @@ public class MongoDbItemDAO implements ItemDAO {
     @Override
     public List<Item> readByNameAndAmount(String name, int minAmount, int maxAmount) throws DAOException {
         List<Item> itemList = new ArrayList<>();
-        FindIterable<Document> documents = itemCollection.find(and(
-                regex("name", name),
-                gte("amount", minAmount),
-                lte("amount", maxAmount)
-        ));
+        FindIterable<Document> documents = itemCollection.find(and(regex("name", name), gte("amount", minAmount), lte("amount", maxAmount)));
         try (MongoCursor<Document> cursor = documents.cursor()) {
             while (cursor.hasNext()) {
                 Document document = cursor.next();
@@ -102,15 +130,7 @@ public class MongoDbItemDAO implements ItemDAO {
     }
 
     private Item mapToItem(Document document) {
-        return new Item.Builder()
-                .id(document.getObjectId("_id").toString())
-                .vendor(document.getString("vendor"))
-                .unit(document.getString("unit"))
-                .weight(BigDecimal.valueOf(document.getDouble("weight")).setScale(4, RoundingMode.FLOOR))
-                .amount(document.getInteger("amount"))
-                .name(document.getString("name"))
-                .reserveRate(document.getInteger("reserve_rate"))
-                .build();
+        return new Item.Builder().id(document.getObjectId("_id").toString()).vendor(document.getString("vendor")).unit(document.getString("unit")).weight(BigDecimal.valueOf(document.getDouble("weight")).setScale(4, RoundingMode.FLOOR)).amount(document.getInteger("amount")).name(document.getString("name")).reserveRate(document.getInteger("reserve_rate")).build();
     }
 
     @Override
@@ -137,15 +157,25 @@ public class MongoDbItemDAO implements ItemDAO {
 
     @Override
     public boolean delete(String id) throws DAOException {
-        UpdateResult updateResult = itemCollection.updateOne(eq("_id", new ObjectId(id)), unset("amount"));
-        return updateResult.getModifiedCount() > 0;
+        int count = 0;
+        while (true) {
+            try {
+                UpdateResult updateResult = itemCollection.updateOne(eq("_id", new ObjectId(id)), unset("amount"));
+                return updateResult.getModifiedCount() > 0;
+            } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
+                if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
+                    throw new DAOException(exception);
+                }
+                count++;
+                sleep(mongoTimeoutProperties.getWaitReconnectDuration());
+            }
+        }
+
     }
 
     @Override
     public List<String> readAllAvailableId() throws DAOException {
-        return readAll().stream()
-                .map(Item::getId)
-                .collect(Collectors.toList());
+        return readAll().stream().map(Item::getId).collect(Collectors.toList());
     }
 
     @Override

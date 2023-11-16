@@ -32,7 +32,9 @@ public class MigrationApplication {
         MySqlDAOConfig config = new MySqlDAOConfig("jdbc:mysql://localhost:3306/warehousecpp", "root", "root");
         mySqlDaoFactory = new MySqlDAOFactory(config);
 
-        MongoDbDAOConfig mongoDbDAOConfig = new MongoDbDAOConfig("mongodb://localhost:27001", "warehouse");
+        MongoDbDAOConfig mongoDbDAOConfig = new MongoDbDAOConfig();
+        mongoDbDAOConfig.setConnectionString("mongodb://localhost:27017");
+        mongoDbDAOConfig.setName("warehouse");
         mongoDbDaoFactory = new MongoDbDaoFactory(mongoDbDAOConfig);
     }
 

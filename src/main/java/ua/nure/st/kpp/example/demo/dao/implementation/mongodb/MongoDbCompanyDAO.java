@@ -1,5 +1,8 @@
 package ua.nure.st.kpp.example.demo.dao.implementation.mongodb;
 
+import com.mongodb.MongoNotPrimaryException;
+import com.mongodb.MongoWriteConcernException;
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -22,11 +25,14 @@ import static com.mongodb.client.model.Updates.set;
 /**
  * @author Stanislav Hlova
  */
-public class MongoDbCompanyDAO implements CompanyDAO {
+public class MongoDbCompanyDAO implements CompanyDAO, MongoDbDAO {
+    private final MongoTimeoutProperties mongoTimeoutProperties;
+
     private final MongoDatabase mongoDatabase;
     private final MongoCollection<Document> companyCollection;
 
-    public MongoDbCompanyDAO(MongoDatabase mongoDatabase) {
+    public MongoDbCompanyDAO(MongoTimeoutProperties mongoTimeoutProperties, MongoDatabase mongoDatabase) {
+        this.mongoTimeoutProperties = mongoTimeoutProperties;
         this.mongoDatabase = mongoDatabase;
         this.companyCollection = mongoDatabase.getCollection("company");
     }
@@ -34,8 +40,19 @@ public class MongoDbCompanyDAO implements CompanyDAO {
     @Override
     public Company create(Company company) throws DAOException {
         Document document = mapToDocument(company);
-        companyCollection.insertOne(document);
-        return read(document.getObjectId("_id").toString());
+        int count = 0;
+        while (true) {
+            try {
+                companyCollection.insertOne(document);
+                return read(document.getObjectId("_id").toString());
+            } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
+                if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
+                    throw new DAOException(exception);
+                }
+                count++;
+                sleep(mongoTimeoutProperties.getWaitReconnectDuration());
+            }
+        }
     }
 
     @Override
@@ -62,11 +79,22 @@ public class MongoDbCompanyDAO implements CompanyDAO {
 
     @Override
     public boolean update(String id, Company company) throws DAOException {
-        UpdateResult updateResult = companyCollection.updateOne(eq("_id", new ObjectId(id)),
-                combine(set("name", company.getName()),
-                        set("email", company.getEmail()),
-                        set("address",company.getAddress())));
-        return updateResult.getModifiedCount() > 0;
+        int count = 0;
+        while (true) {
+            try {
+                UpdateResult updateResult = companyCollection.updateOne(eq("_id", new ObjectId(id)),
+                        combine(set("name", company.getName()),
+                                set("email", company.getEmail()),
+                                set("address",company.getAddress())));
+                return updateResult.getModifiedCount() > 0;
+            } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
+                if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
+                    throw new DAOException(exception);
+                }
+                count++;
+                sleep(mongoTimeoutProperties.getWaitReconnectDuration());
+            }
+        }
     }
 
     private Document mapToDocument(Company company) {

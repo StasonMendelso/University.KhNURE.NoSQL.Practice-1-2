@@ -1,6 +1,7 @@
 package ua.nure.st.kpp.example.demo.dao.implementation.mongodb;
 
-import com.mongodb.MongoException;
+import com.mongodb.MongoClient;
+import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
@@ -28,14 +29,17 @@ import static com.mongodb.client.model.Filters.eq;
 /**
  * @author Stanislav Hlova
  */
-public class MongoDbIncomeJournalDAO implements IncomeJournalDAO {
+public class MongoDbIncomeJournalDAO implements IncomeJournalDAO, MongoDbDAO {
     private final MongoClient mongoClient;
+    private final MongoTimeoutProperties mongoTimeoutProperties;
+
     private final MongoDatabase mongoDatabase;
     private final MongoCollection<Document> itemCollection;
     private final MongoCollection<Document> companyCollection;
 
-    public MongoDbIncomeJournalDAO(MongoClient mongoClient, MongoDatabase mongoDatabase) {
+    public MongoDbIncomeJournalDAO(MongoClient mongoClient, MongoTimeoutProperties mongoTimeoutProperties, MongoDatabase mongoDatabase) {
         this.mongoClient = mongoClient;
+        this.mongoTimeoutProperties = mongoTimeoutProperties;
         this.mongoDatabase = mongoDatabase;
         this.itemCollection = mongoDatabase.getCollection("item");
         this.companyCollection = mongoDatabase.getCollection("company");
@@ -45,33 +49,41 @@ public class MongoDbIncomeJournalDAO implements IncomeJournalDAO {
     public boolean createRecord(Record record) throws DAOException {
         //Note: A ClientSession instance can not be used concurrently in multiple operations.
         ClientSession clientSession = mongoClient.startSession();
-        try {
-            clientSession.startTransaction();
+        int count = 0;
+        while (true) {
+            try {
+                clientSession.startTransaction();
 
-            UpdateResult updateResult = itemCollection.updateOne(clientSession,
-                    eq("_id", new ObjectId(record.getItem().getId())),
-                    Updates.inc("amount", record.getAmount()));
-            if (updateResult.getModifiedCount() == 0) {
-                clientSession.abortTransaction();
-                return false;
-            }
-            updateResult = itemCollection.updateOne(clientSession, eq("_id", new ObjectId(record.getItem().getId())),
-                    Updates.push("income_journal", mapToDocument(record)));
-            if (updateResult.getModifiedCount() == 0) {
-                clientSession.abortTransaction();
-                return false;
-            }
+                UpdateResult updateResult = itemCollection.updateOne(clientSession,
+                        eq("_id", new ObjectId(record.getItem().getId())),
+                        Updates.inc("amount", record.getAmount()));
+                if (updateResult.getModifiedCount() == 0) {
+                    abortTransactionAndCloseSession(clientSession);
+                    return false;
+                }
+                updateResult = itemCollection.updateOne(clientSession, eq("_id", new ObjectId(record.getItem().getId())),
+                        Updates.push("income_journal", mapToDocument(record)));
+                if (updateResult.getModifiedCount() == 0) {
+                    abortTransactionAndCloseSession(clientSession);
+                    return false;
+                }
 
-            clientSession.commitTransaction();
-        } catch (MongoException mongoException) {
-            clientSession.abortTransaction();
-            throw new DAOException(mongoException);
-        } finally {
-            clientSession.close();
+                clientSession.commitTransaction();
+            } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
+                clientSession.abortTransaction();
+                if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
+                    throw new DAOException(exception);
+                }
+                count++;
+                sleep(mongoTimeoutProperties.getWaitReconnectDuration());
+            } catch (MongoException mongoException) {
+                abortTransactionAndCloseSession(clientSession);
+                throw new DAOException(mongoException);
+            }
         }
-
-        return false;
     }
+
+
 
     private Document mapToDocument(Record record) {
         return new Document()
@@ -167,80 +179,89 @@ public class MongoDbIncomeJournalDAO implements IncomeJournalDAO {
     public boolean updateRecord(String id, Record record) throws DAOException {
         //Note: A ClientSession instance can not be used concurrently in multiple operations.
         ClientSession clientSession = mongoClient.startSession();
-        try {
-            clientSession.startTransaction();
+        int count = 0;
+        while (true) {
+            try {
+                clientSession.startTransaction();
 
-            Record recordFromDb = read(id);
-            UpdateResult updateResult = itemCollection.updateOne(clientSession, eq("_id", new ObjectId(recordFromDb.getItem().getId())), Updates.inc("amount", -recordFromDb.getAmount()));
-            if (updateResult.getModifiedCount() == 0) {
-                clientSession.abortTransaction();
-                return false;
-            }
-            updateResult = itemCollection.updateOne(clientSession,
-                    Filters.eq("income_journal._id", new ObjectId(id)),
-                    Updates.pull("income_journal", new Document("_id", new ObjectId(id)))
-            );
-            if (updateResult.getModifiedCount() == 0) {
-                clientSession.abortTransaction();
-                return false;
-            }
+                Record recordFromDb = read(id);
+                UpdateResult updateResult = itemCollection.updateOne(clientSession, eq("_id", new ObjectId(recordFromDb.getItem().getId())), Updates.inc("amount", -recordFromDb.getAmount()));
+                if (updateResult.getModifiedCount() == 0) {
+                    clientSession.abortTransaction();
+                    return false;
+                }
+                updateResult = itemCollection.updateOne(clientSession,
+                        Filters.eq("income_journal._id", new ObjectId(id)),
+                        Updates.pull("income_journal", new Document("_id", new ObjectId(id)))
+                );
+                if (updateResult.getModifiedCount() == 0) {
+                    abortTransactionAndCloseSession(clientSession);
+                    return false;
+                }
 
-            updateResult = itemCollection.updateOne(clientSession, eq("_id", new ObjectId(record.getItem().getId())), Updates.inc("amount", record.getAmount()));
-            if (updateResult.getModifiedCount() == 0) {
-                clientSession.abortTransaction();
-                return false;
-            }
-            updateResult = itemCollection.updateOne(clientSession, eq("_id", new ObjectId(record.getItem().getId())),
-                    Updates.push("income_journal", mapToDocument(record)));
-            if (updateResult.getModifiedCount() == 0) {
-                clientSession.abortTransaction();
-                return false;
-            }
+                updateResult = itemCollection.updateOne(clientSession, eq("_id", new ObjectId(record.getItem().getId())), Updates.inc("amount", record.getAmount()));
+                if (updateResult.getModifiedCount() == 0) {
+                    abortTransactionAndCloseSession(clientSession);
+                    return false;
+                }
+                updateResult = itemCollection.updateOne(clientSession, eq("_id", new ObjectId(record.getItem().getId())),
+                        Updates.push("income_journal", mapToDocument(record)));
+                if (updateResult.getModifiedCount() == 0) {
+                    abortTransactionAndCloseSession(clientSession);
+                    return false;
+                }
 
-
-            clientSession.commitTransaction();
-        } catch (MongoException mongoException) {
-            clientSession.abortTransaction();
-            throw new DAOException(mongoException);
-        } finally {
-            clientSession.close();
+                clientSession.commitTransaction();
+            } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
+                clientSession.abortTransaction();
+                if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
+                    throw new DAOException(exception);
+                }
+                count++;
+                sleep(mongoTimeoutProperties.getWaitReconnectDuration());
+            } catch (MongoException mongoException) {
+                abortTransactionAndCloseSession(clientSession);
+                throw new DAOException(mongoException);
+            }
         }
-
-        return false;
     }
 
     @Override
     public boolean deleteRecord(String id) throws DAOException {
-
         //Note: A ClientSession instance can not be used concurrently in multiple operations.
         ClientSession clientSession = mongoClient.startSession();
-        try {
-            clientSession.startTransaction();
-            Record recordFromDb = read(id);
-            UpdateResult updateResult = itemCollection.updateOne(clientSession, eq("_id", new ObjectId(recordFromDb.getItem().getId())), Updates.inc("amount", -recordFromDb.getAmount()));
-            if (updateResult.getModifiedCount() == 0) {
-                clientSession.abortTransaction();
-                return false;
-            }
-            updateResult = itemCollection.updateOne(clientSession,
-                    Filters.eq("income_journal._id", new ObjectId(id)),
-                    Updates.pull("income_journal", new Document("_id", new ObjectId(id)))
-            );
-            if (updateResult.getModifiedCount() == 0) {
-                clientSession.abortTransaction();
-                return false;
-            }
+        int count = 0;
+        while (true) {
+            try {
+                clientSession.startTransaction();
+                Record recordFromDb = read(id);
+                UpdateResult updateResult = itemCollection.updateOne(clientSession, eq("_id", new ObjectId(recordFromDb.getItem().getId())), Updates.inc("amount", -recordFromDb.getAmount()));
+                if (updateResult.getModifiedCount() == 0) {
+                    abortTransactionAndCloseSession(clientSession);
+                    return false;
+                }
+                updateResult = itemCollection.updateOne(clientSession,
+                        Filters.eq("income_journal._id", new ObjectId(id)),
+                        Updates.pull("income_journal", new Document("_id", new ObjectId(id)))
+                );
+                if (updateResult.getModifiedCount() == 0) {
+                    abortTransactionAndCloseSession(clientSession);
+                    return false;
+                }
 
-            clientSession.commitTransaction();
-        } catch (MongoException mongoException) {
-            clientSession.abortTransaction();
-            throw new DAOException(mongoException);
-        } finally {
-            clientSession.close();
+                clientSession.commitTransaction();
+            } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
+                clientSession.abortTransaction();
+                if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
+                    throw new DAOException(exception);
+                }
+                count++;
+                sleep(mongoTimeoutProperties.getWaitReconnectDuration());
+            } catch (MongoException mongoException) {
+                abortTransactionAndCloseSession(clientSession);
+                throw new DAOException(mongoException);
+            }
         }
-
-        return false;
-
     }
 
     @Override
