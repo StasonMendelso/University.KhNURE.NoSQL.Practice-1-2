@@ -33,15 +33,21 @@ public class MigrationApplication {
         mySqlDaoFactory = new MySqlDAOFactory(config);
 
         MongoDbDAOConfig mongoDbDAOConfig = new MongoDbDAOConfig();
-        mongoDbDAOConfig.setConnectionString("mongodb://localhost:27017");
         mongoDbDAOConfig.setName("warehouse");
+        mongoDbDAOConfig.setReplicaSet(true);
+        mongoDbDAOConfig.setServerAddress(List.of(
+                new MongoDbDAOConfig.ServerAddressProperties("localhost", 27001),
+                new MongoDbDAOConfig.ServerAddressProperties("localhost", 27002),
+                new MongoDbDAOConfig.ServerAddressProperties("localhost", 27003)));
+        mongoDbDAOConfig.setNumberOfReconnect(3);
+        mongoDbDAOConfig.setWaitReconnectDuration(1000);
         mongoDbDaoFactory = new MongoDbDaoFactory(mongoDbDAOConfig);
     }
 
 
     public static void main(String[] args) throws DAOException {
-        //    migrateToMongoDB();
-        migrateToMySql();
+            migrateToMongoDB();
+//        migrateToMySql();
     }
 
     private static void migrateToMongoDB() throws DAOException {

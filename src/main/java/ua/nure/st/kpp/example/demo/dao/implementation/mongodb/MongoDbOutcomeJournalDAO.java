@@ -67,6 +67,7 @@ public class MongoDbOutcomeJournalDAO implements OutcomeJournalDAO, MongoDbDAO {
                 }
 
                 clientSession.commitTransaction();
+                return true;
             } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
                 clientSession.abortTransaction();
                 if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
@@ -207,6 +208,7 @@ public class MongoDbOutcomeJournalDAO implements OutcomeJournalDAO, MongoDbDAO {
                     return false;
                 }
                 clientSession.commitTransaction();
+                return true;
             } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
                 clientSession.abortTransaction();
                 if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
@@ -245,6 +247,7 @@ public class MongoDbOutcomeJournalDAO implements OutcomeJournalDAO, MongoDbDAO {
                 }
 
                 clientSession.commitTransaction();
+                return true;
             } catch (MongoWriteConcernException | MongoNotPrimaryException | MongoWriteException exception) {
                 clientSession.abortTransaction();
                 if (count == mongoTimeoutProperties.getNumberOfReconnect()) {
