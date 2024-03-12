@@ -24,6 +24,7 @@ For running the project you need the next:
   database.
   You can find the [scripts](database/sql) of [creating](database/sql/creation_database.sql)
   and [adding data](database/sql/adding_data.sql) to the database in directory with name "*[database](database/sql)*".
+* [MongoDB](https://www.mongodb.com/) - for running the app with MongoDB database.
 
 ### Installation Instruction
 
